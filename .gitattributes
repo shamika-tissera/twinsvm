@@ -1,0 +1,8 @@
+# Normalise all text files to LF in the repo and on checkout, so the
+# package's C/C++ sources, Makevars and scripts keep Unix line endings on
+# every platform (CRLF can trip R CMD check on Linux/macOS).
+* text=auto eol=lf
+*.png binary
+*.pdf binary
+*.rds binary
+*.RData binary
