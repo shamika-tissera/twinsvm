@@ -48,13 +48,14 @@ jobs:
       # when no such binary is on PATH. Rtools ships gcc, not cc. Record both
       # facts so a NOTE from that path is diagnosable from the log alone.
       - name: Report BLAS and cc availability
-        shell: bash
+        shell: Rscript {0}
         run: |
-          Rscript -e 'ns <- asNamespace("tools");
-            cat("BLAS       :", sessionInfo()$BLAS, "\n");
-            cat("Sys.which(cc):", dQuote(Sys.which("cc")), "\n");
-            cat("Sys.which(gcc):", dQuote(Sys.which("gcc")), "\n");
-            cat("nonAPI class:", class(ns$nonAPI), "length:", length(ns$nonAPI), "\n")'
+          ns <- asNamespace("tools")
+          cat("R          :", R.version.string, "\n")
+          cat("BLAS       :", sessionInfo()$BLAS, "\n")
+          cat("which cc   :", sQuote(Sys.which("cc")), "\n")
+          cat("which gcc  :", sQuote(Sys.which("gcc")), "\n")
+          cat("nonAPI     :", class(ns$nonAPI), "length", length(ns$nonAPI), "\n")
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
