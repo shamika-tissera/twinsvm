@@ -1,6 +1,6 @@
 Package: twinsvm
 Title: Twin Support Vector Machines
-Version: 0.0.3
+Version: 0.0.4
 Authors@R: 
     person("Shamika", "Tissera", email = "nimeshshamika@gmail.com", role = c("aut", "cre"))
 Author: Shamika Tissera [aut, cre]

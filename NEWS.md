@@ -1,3 +1,16 @@
+# twinsvm 0.0.4
+
+* Test suite no longer compares support-vector counts at a fixed tolerance.
+  The count thresholds dual variables that can sit exactly at the cost bound, so
+  it varies with the BLAS the checking machine links against; this made
+  `test-baselines.R` fail on the CRAN MKL and OpenBLAS check flavors while
+  passing everywhere else. Counts are now compared up to a small fraction of the
+  sample size, and the exact-value regression test is `skip_on_cran()`.
+  Per-point prediction agreement against `e1071` is unchanged and remains the
+  strict correctness check.
+* Reference-fit tolerances relaxed from 1e-6 to 1e-5 for the same reason.
+* No model-fitting or prediction behavior changed.
+
 # twinsvm 0.0.3
 
 * New `resample_accuracy()` evaluates `tsvm()` and `svms()` over repeated
