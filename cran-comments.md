@@ -38,13 +38,34 @@ implementations.
 ## Test environments
 
 * Local: Windows 11, R 4.6.0, `R CMD check --as-cran`
-* GitHub Actions: macOS-latest (release), Windows-latest (release),
+* GitHub Actions: macOS-latest (release), Windows-latest (release and devel),
   Ubuntu-latest (devel, release, oldrel-1)
+* GitHub Actions: Ubuntu-latest (release) with R linked against OpenBLAS
 
-I do not have an MKL- or OpenBLAS-linked R to reproduce the original failure
-directly. The fix targets the mechanism rather than the observed magnitude: the
-new bound is 12 support vectors on n = 120, against an observed cross-BLAS drift
-of 4.
+The last of those was added for this release, so that the flavor behind the
+archival is exercised before submission rather than after. It passes.
+
+The new bound is 12 support vectors on n = 120, against an observed cross-BLAS
+drift of 4.
+
+## Note on the 2026-08-03 pre-test
+
+The Windows pre-test of this tarball reported a second NOTE:
+
+    * checking compiled code ... NOTE
+    Error in ccE(lines, flags = new_flags, include = include) :
+      'cc' is not on the path
+    Execution halted
+
+This is an abort inside `tools:::ccE`, which hardcodes the compiler name `cc`;
+Rtools provides `gcc`, and `Sys.which("cc")` is empty on a stock Windows R. It
+appears specific to the snapshot used for that flavor, R-devel 2026-07-30
+r90327. On the newer r90339 the Debian pre-test of this same tarball reported
+`checking compiled code ... OK`, and `R CMD check` on Windows under r-devel
+r90339 also reports `checking compiled code ... OK` with overall `Status: OK`.
+
+`src/` in 0.0.4 is byte-for-byte identical to `src/` in 0.0.2, which was OK on
+r-devel-windows-x86_64. No C++ source, header, or Makevars file changed.
 
 ## R CMD check results
 
