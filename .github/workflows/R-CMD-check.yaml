@@ -67,6 +67,54 @@ jobs:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
 
+  # Reproduces the CRAN Windows pre-test environment. GitHub's Windows runners
+  # ship a cc.exe at C:\mingw64\bin, which CRAN's machines do not have: Rtools
+  # provides gcc, and tools:::ccE hardcodes the name "cc". Removing cc first is
+  # the only way this matrix can tell us whether R-devel's "checking compiled
+  # code" step actually needs it.
+  R-CMD-check-windows-devel-no-cc:
+    runs-on: windows-latest
+    name: windows-latest (devel, no cc on PATH)
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'devel'
+          use-public-rspm: true
+
+      - name: Remove cc from PATH
+        shell: bash
+        run: |
+          for f in /c/mingw64/bin/cc.exe /c/mingw64/bin/cc; do
+            if [ -e "$f" ]; then mv "$f" "$f.disabled"; echo "disabled $f"; fi
+          done
+
+      - name: Confirm cc is gone and gcc remains
+        shell: Rscript {0}
+        run: |
+          cat("R        :", R.version.string, "\n")
+          cat("which cc :", sQuote(Sys.which("cc")), "\n")
+          cat("which gcc:", sQuote(Sys.which("gcc")), "\n")
+          if (nzchar(Sys.which("cc"))) stop("cc is still on PATH; test is invalid")
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+
   # CRAN runs extra "Additional issues" checks against alternative BLAS
   # implementations. Version 0.0.2 passed every regular flavor and failed only
   # there, which is what got the package archived. The default R builds used
