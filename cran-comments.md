@@ -50,22 +50,36 @@ drift of 4.
 
 ## Note on the 2026-08-03 pre-test
 
-The Windows pre-test of this tarball reported a second NOTE:
+The Windows pre-test of this tarball reported a second NOTE, which I expect to
+recur:
 
     * checking compiled code ... NOTE
     Error in ccE(lines, flags = new_flags, include = include) :
       'cc' is not on the path
     Execution halted
 
-This is an abort inside `tools:::ccE`, which hardcodes the compiler name `cc`;
-Rtools provides `gcc`, and `Sys.which("cc")` is empty on a stock Windows R. It
-appears specific to the snapshot used for that flavor, R-devel 2026-07-30
-r90327. On the newer r90339 the Debian pre-test of this same tarball reported
-`checking compiled code ... OK`, and `R CMD check` on Windows under r-devel
-r90339 also reports `checking compiled code ... OK` with overall `Status: OK`.
+This is an abort inside `tools:::ccE`, which opens with
+
+    if (Sys.which("cc") == "") stop("'cc' is not on the path")
+
+and then runs `cc -E`. The compiler name is hardcoded, with no fallback to
+`gcc` and no use of `CC` from Makeconf. Rtools provides `gcc` and ships no `cc`.
+
+The CI job `windows-latest (devel, no cc on PATH)` exists to demonstrate this.
+GitHub's Windows runners carry a `cc.exe` at `C:\mingw64\bin`; that job renames
+it and changes nothing else. On R-devel r90339, same package, same R:
+
+| `cc.exe` | `checking compiled code` |
+| -------- | ------------------------ |
+| present  | OK                       |
+| renamed  | NOTE, `'cc' is not on the path` |
+
+The error also reproduces in a bare R session with twinsvm never loaded, by
+calling `tools:::getFunAPI()` directly.
 
 `src/` in 0.0.4 is byte-for-byte identical to `src/` in 0.0.2, which was OK on
-r-devel-windows-x86_64. No C++ source, header, or Makevars file changed.
+r-devel-windows-x86_64. No C++ source, header, or Makevars file changed. No
+change to this package can prevent the NOTE.
 
 ## R CMD check results
 
