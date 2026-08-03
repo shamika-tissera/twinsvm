@@ -48,4 +48,15 @@ of 4.
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 note
+
+* checking CRAN incoming feasibility ... NOTE
+  Maintainer: 'Shamika Tissera <nimeshshamika@gmail.com>'
+  New submission
+  Package was archived on CRAN
+  CRAN repository db overrides:
+    X-CRAN-Comment: Archived on 2026-08-02 as issues were not corrected
+      in time.
+
+  This NOTE reports the archival described above and is expected for a
+  resubmission.
